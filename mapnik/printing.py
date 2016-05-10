@@ -474,7 +474,7 @@ class PDFPrinter:
                 bbox = pyPdf.generic.ArrayObject()
 
                 for x in self.map_box:
-                    bbox.append(pyPdf.generic.FloatObject(str(x)))
+                    bbox.append(pyPdf.generic.FloatObject(str(m2pt(x))))
                 vp[pyPdf.generic.NameObject('/BBox')] = bbox
                 vp[pyPdf.generic.NameObject('/Measure')] = measure
 

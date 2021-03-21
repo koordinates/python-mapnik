@@ -1,0 +1,223 @@
+python-mapnik (1:3.0.23+ci1-git20200224.7da019cf9) bionic; urgency=medium
+
+  * Koordinates CI build of 7da019cf9eb12af8f8aa88b7d75789dfcd1e901b:
+    branch=kx-3.0.x-bionic tag=
+
+ -- Koordinates CI Builder <support@koordinates.com>  Sun, 21 Mar 2021 20:36:45 +0000
+
+python-mapnik (1:0.0~20180130-804a7947d-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Rebuild with Mapnik 3.0.19.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 10 Mar 2018 09:56:59 +0100
+
+python-mapnik (1:0.0~20170621-0cd7493f2-3) unstable; urgency=medium
+
+  * Update copyright-format URL to use HTTPS.
+  * Bump Standards-Version to 4.1.3, no changes.
+  * Rebuild with Mapnik 3.0.18.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 27 Jan 2018 10:19:12 +0100
+
+python-mapnik (1:0.0~20170621-0cd7493f2-2) unstable; urgency=medium
+
+  * Bump Standards-Version to 4.1.1, no changes.
+  * Update watch file to use HTTPS.
+  * Rebuild with Mapnik 3.0.17.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Thu, 30 Nov 2017 15:19:22 +0100
+
+python-mapnik (1:0.0~20170621-0cd7493f2-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump Standards-Version to 4.0.0, no changes.
+  * Add autopkgtest to test installability.
+  * Refresh patches.
+  * Bump minimum required libmapnik-dev to 3.0.15.
+  * Move from experimental to unstable.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Tue, 29 Aug 2017 20:46:40 +0200
+
+python-mapnik (1:0.0~20170602-1635afe-1~exp1) experimental; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump minimum required libmapnik-dev to 3.0.14.
+  * Enable PIE hardening buildflags.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Mon, 05 Jun 2017 20:16:11 +0200
+
+python-mapnik (1:0.0~20170120-8139e5c-1~exp1) experimental; urgency=medium
+
+  * New upstream git snapshot.
+  * Drop pr123-install-mapnik-printing.patch, included upstream.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Mon, 06 Feb 2017 19:42:26 +0100
+
+python-mapnik (1:0.0~20170119-5a6896f-1~exp1) experimental; urgency=medium
+
+  * New upstream git snapshot.
+  * Update get-orig-source script to use the v3.0.x branch.
+  * Add license & copyright for demo data & script.
+  * Install demo in examples.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Fri, 20 Jan 2017 15:24:31 +0100
+
+python-mapnik (1:0.0~20161104-ea5fd11-2) unstable; urgency=medium
+
+  * Add patch to fix installation of mapnik.printing module.
+    (closes: #843974)
+
+ -- Bas Couwenberg <sebastic@debian.org>  Fri, 11 Nov 2016 12:38:38 +0100
+
+python-mapnik (1:0.0~20161104-ea5fd11-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Update skip-tests-for-missing-data.patch for test_pdf_printing().
+  * Rebuild for boost1.62 transition.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 05 Nov 2016 15:29:19 +0100
+
+python-mapnik (1:0.0~20160830-541fd96-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump minimum required libmapnik-dev to 3.0.12.
+  * Move from experimental to unstable.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Thu, 08 Sep 2016 15:50:54 +0200
+
+python-mapnik (1:0.0~20160810-3a60211-1~exp1) experimental; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump minimum required libmapnik-dev to 3.0.12~rc3.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Fri, 12 Aug 2016 19:59:37 +0200
+
+python-mapnik (1:0.0~20160809-7258eea-1~exp1) experimental; urgency=medium
+
+  * New upstream git snapshot.
+  * Drop denominator-typo.patch, applied upstream.
+  * Bump minimum required libmapnik-dev to 3.0.12~rc2.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Wed, 10 Aug 2016 13:48:52 +0200
+
+python-mapnik (1:0.0~20160726-1c4a51d-1~exp2) experimental; urgency=medium
+
+  * Add patch to skip tests for missing data.
+  * Rebuild with libmapnik-dev (3.0.12~rc1+ds-1~exp2).
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sun, 07 Aug 2016 11:49:41 +0200
+
+python-mapnik (1:0.0~20160726-1c4a51d-1~exp1) experimental; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump minimum required libmapnik-dev to 3.0.12.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Fri, 05 Aug 2016 16:06:56 +0200
+
+python-mapnik (1:0.0~20160531-f65767a-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+    - Add pycairo support for Python 3.
+    - Avoid duplicate conversions registrations.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Mon, 27 Jun 2016 00:12:04 +0200
+
+python-mapnik (1:0.0~20160412-5b015f2-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump Standards-Version to 3.9.8, no changes.
+  * Enable pycairo support.
+    (closes: #823549)
+
+ -- Bas Couwenberg <sebastic@debian.org>  Thu, 05 May 2016 23:16:09 +0200
+
+python-mapnik (1:0.0~20160330-5d72b49-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 02 Apr 2016 03:23:28 +0200
+
+python-mapnik (1:0.0~20160317-275bfae-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump minimum required libmapnik-dev to 3.0.10.
+  * Bump Standards-Version to 3.9.7, no changes.
+  * Update Vcs-Git URL to use HTTPS.
+  * Drop license & copyright for mapnik/__init__.py, now LGPL-2.1+ too.
+  * Add (build) dependencies on python{,3}-cairo.
+  * Drop mapnik-libdir.patch, applied upstream.
+  * Override dh_strip to not create dbgsym packages,
+    debug files contain no debug symbols.
+  * Add patch to fix 'denominator' typo.
+  * Enable all hardening buildflags, except pie (causes build failure).
+
+ -- Bas Couwenberg <sebastic@debian.org>  Fri, 18 Mar 2016 21:03:11 +0100
+
+python-mapnik (1:0.0~20151125-92e79d2-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Bump minimum required libmapnik-dev to 3.0.9.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Fri, 27 Nov 2015 01:49:26 +0100
+
+python-mapnik (1:0.0~20151022-ab8b1f6-2) unstable; urgency=medium
+
+  * Fix mapniklibpath in paths.py for custom path used by mapnik.
+    (closes: #803564)
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 31 Oct 2015 17:06:08 +0100
+
+python-mapnik (1:0.0~20151022-ab8b1f6-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Drop system-fonts.patch, applied upstream.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 24 Oct 2015 14:57:43 +0200
+
+python-mapnik (1:0.0~20151012-a063df4-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Use system fonts instead of mapnik specific fonts.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Thu, 15 Oct 2015 10:05:56 +0200
+
+python-mapnik (1:0.0~20151010-b223124-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sat, 10 Oct 2015 17:16:31 +0200
+
+python-mapnik (1:0.0~20150909-1489d53-1) unstable; urgency=medium
+
+  * New upstream git snapshot.
+  * Drop patches, included upstream.
+  * Require at least libmapnik-dev 3.0.5 for get_format changes.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sun, 13 Sep 2015 01:25:54 +0200
+
+python-mapnik (1:0.0~20150817-da1d9dd-2) unstable; urgency=medium
+
+  * Use upstream patch for boost library names fix.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Sun, 30 Aug 2015 18:36:37 +0200
+
+python-mapnik (1:0.0~20150817-da1d9dd-1) unstable; urgency=medium
+
+  * New upstream Git snapshot.
+  * Drop patches applied upstream.
+  * Update Vcs-Browser URL to use HTTPS.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Tue, 25 Aug 2015 22:40:18 +0200
+
+python-mapnik (1:0.0~20150708-c005502-2) unstable; urgency=medium
+
+  * Also build bindings for Python 3.
+
+ -- Bas Couwenberg <sebastic@debian.org>  Thu, 23 Jul 2015 21:54:21 +0200
+
+python-mapnik (1:0.0~20150708-c005502-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #792539)
+
+ -- Bas Couwenberg <sebastic@debian.org>  Thu, 16 Jul 2015 23:15:09 +0200

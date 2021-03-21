@@ -1,0 +1,156 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: python-mapnik
+Upstream-Contact: https://github.com/mapnik/python-mapnik/issues
+Source: https://github.com/mapnik/python-mapnik
+
+Files: *
+Copyright: 2015, Artem Pavlenko
+           2015, Jean-Francois Doyon
+           2010, Robert Coup
+License: LGPL-2.1+
+
+Files: demo/data/*
+Copyright: 2003, Government of Canada with permission from Natural Resources Canada
+Comment: Contains information licensed under the Open Government Licence – Canada.
+ License text from: http://open.canada.ca/en/open-government-licence-canada
+License: OpenGovernmentLicence-Canada-2.0
+
+Files: demo/python/rundemo.py
+Copyright: 2005, Jean-Francois Doyon
+License: GPL-2+
+
+Files: debian/*
+Copyright: Bas Couwenberg <sebastic@debian.org>
+License: GPL-2+
+
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ .
+ On Debian systems, the complete text of version 2 of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL-2'.
+
+License: LGPL-2.1+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ .
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ .
+ On Debian systems, the full text of the GNU Lesser General Public
+ License version 2.1 can be found in the file
+ `/usr/share/common-licenses/LGPL-2.1'.
+
+License: OpenGovernmentLicence-Canada-2.0
+ Open Government Licence - Canada
+ .
+ You are encouraged to use the Information that is available under this
+ licence with only a few conditions.
+ .
+ Using Information under this licence
+ .
+  * Use of any Information indicates your acceptance of the terms below.
+  * The Information Provider grants you a worldwide, royalty-free,
+    perpetual, non-exclusive licence to use the Information, including
+    for commercial purposes, subject to the terms below.
+ .
+ You are free to:
+ .
+  * Copy, modify, publish, translate, adapt, distribute or otherwise use
+    the Information in any medium, mode or format for any lawful purpose.
+ .
+ You must, where you do any of the above:
+ .
+  * Acknowledge the source of the Information by including any attribution
+    statement specified by the Information Provider(s) and, where possible,
+    provide a link to this licence.
+  * If the Information Provider does not provide a specific attribution
+    statement, or if you are using Information from several information
+    providers and multiple attributions are not practical for your product
+    or application, you must use the following attribution statement:
+ .
+    Contains information licensed under the Open Government Licence – Canada.
+ .
+ The terms of this licence are important, and if you fail to comply with
+ any of them, the rights granted to you under this licence, or any similar
+ licence granted by the Information Provider, will end automatically.
+ .
+ Exemptions
+ .
+ This licence does not grant you any right to use:
+ .
+  * Personal Information;
+  * third party rights the Information Provider is not authorized to license;
+  * the names, crests, logos, or other official symbols of the Information
+    Provider; and
+  * Information subject to other intellectual property rights, including
+    patents, trade-marks and official marks.
+ .
+ Non-endorsement
+ .
+ This licence does not grant you any right to use the Information in a way
+ that suggests any official status or that the Information Provider endorses
+ you or your use of the Information.
+ .
+ No Warranty
+ .
+ The Information is licensed “as is”, and the Information Provider excludes
+ all representations, warranties, obligations, and liabilities, whether
+ express or implied, to the maximum extent permitted by law.
+ .
+ The Information Provider is not liable for any errors or omissions in the
+ Information, and will not under any circumstances be liable for any direct,
+ indirect, special, incidental, consequential, or other loss, injury or damage
+ caused by its use or otherwise arising in connection with this licence or the
+ Information, even if specifically advised of the possibility of such loss,
+ injury or damage.
+ .
+ Governing Law
+ .
+ This licence is governed by the laws of the province of Ontario and the
+ applicable laws of Canada.
+ .
+ Legal proceedings related to this licence may only be brought in the courts
+ of Ontario or the Federal Court of Canada.
+ .
+ Definitions
+ .
+ In this licence, the terms below have the following meanings:
+ .
+ "Information"
+ means information resources protected by copyright or other information
+ that is offered for use under the terms of this licence.
+ .
+ "Information Provider"
+  means Her Majesty the Queen in right of Canada.
+ .
+ “Personal Information”
+ means “personal information” as defined in section 3 of the Privacy Act,
+ R.S.C. 1985, c. P-21.
+ .
+ "You"
+ means the natural or legal person, or body of persons corporate or
+ incorporate, acquiring rights under this licence.
+ .
+ Versioning
+ This is version 2.0 of the Open Government Licence – Canada. The
+ Information Provider may make changes to the terms of this licence from time
+ to time and issue a new version of the licence. Your use of the Information
+ will be governed by the terms of the licence in force as of the date you
+ accessed the information.
+

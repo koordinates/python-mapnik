@@ -1,0 +1,1508 @@
+Description: Skip tests for missing data.
+Author: Bas Couwenberg <sebastic@debian.org>
+Forwarded: https://github.com/mapnik/python-mapnik/pull/107
+
+--- a/test/python_tests/sqlite_rtree_test.py
++++ b/test/python_tests/sqlite_rtree_test.py
+@@ -5,6 +5,7 @@ import sys
+ import threading
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -30,6 +31,9 @@ def create_ds(test_db, table):
+ if 'sqlite' in mapnik.DatasourceCache.plugin_names():
+ 
+     def test_rtree_creation():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         test_db = '../data/sqlite/world.sqlite'
+         index = test_db + '.index'
+         table = 'world_merc'
+--- a/test/python_tests/cairo_test.py
++++ b/test/python_tests/cairo_test.py
+@@ -6,6 +6,7 @@ import os
+ import shutil
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -178,6 +179,9 @@ if mapnik.has_pycairo():
+ 
+     if 'sqlite' in mapnik.DatasourceCache.plugin_names():
+         def _pycairo_surface(type, sym):
++            if not os.path.exists('../data/good_maps/%s_symbolizer.xml' % sym):
++                raise SkipTest
++
+             test_cairo_file = '/tmp/mapnik-cairo-surface-test.%s.%s' % (
+                 sym, type)
+             expected_cairo_file = './images/pycairo/cairo-surface-expected.%s.%s' % (
+--- a/test/python_tests/compositing_test.py
++++ b/test/python_tests/compositing_test.py
+@@ -5,6 +5,7 @@ from __future__ import print_function
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -182,6 +183,9 @@ def test_pre_multiply_status_of_map2():
+ 
+ if 'shape' in mapnik.DatasourceCache.plugin_names():
+     def test_style_level_comp_op():
++        if not os.path.exists('../data/good_maps/style_level_comp_op.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/style_level_comp_op.xml')
+         m.zoom_all()
+@@ -218,6 +222,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         eq_(len(fails), 0, '\n' + '\n'.join(fails))
+ 
+     def test_style_level_opacity():
++        if not os.path.exists('../data/good_maps/style_level_opacity_and_blur.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(
+             m, '../data/good_maps/style_level_opacity_and_blur.xml')
+@@ -235,6 +242,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+ 
+ def test_rounding_and_color_expectations():
++    if not os.path.exists('../data/images/stripes_pattern.png'):
++        raise SkipTest
++
+     m = mapnik.Map(1, 1)
+     m.background = mapnik.Color('rgba(255,255,255,.4999999)')
+     im = mapnik.Image(m.width, m.height)
+@@ -260,6 +270,9 @@ def test_rounding_and_color_expectations
+ 
+ 
+ def test_background_image_and_background_color():
++    if not os.path.exists('../data/images/stripes_pattern.png'):
++        raise SkipTest
++
+     m = mapnik.Map(8, 8)
+     m.background = mapnik.Color('rgba(255,255,255,.5)')
+     m.background_image = '../data/images/stripes_pattern.png'
+@@ -269,6 +282,9 @@ def test_background_image_and_background
+ 
+ 
+ def test_background_image_with_alpha_and_background_color():
++    if not os.path.exists('../data/images/yellow_half_trans.png'):
++        raise SkipTest
++
+     m = mapnik.Map(10, 10)
+     m.background = mapnik.Color('rgba(255,255,255,.5)')
+     m.background_image = '../data/images/yellow_half_trans.png'
+@@ -278,6 +294,9 @@ def test_background_image_with_alpha_and
+ 
+ 
+ def test_background_image_with_alpha_and_background_color_against_composited_control():
++    if not os.path.exists('../data/images/yellow_half_trans.png'):
++        raise SkipTest
++
+     m = mapnik.Map(10, 10)
+     m.background = mapnik.Color('rgba(255,255,255,.5)')
+     m.background_image = '../data/images/yellow_half_trans.png'
+--- a/test/python_tests/csv_test.py
++++ b/test/python_tests/csv_test.py
+@@ -7,6 +7,7 @@ import glob
+ import os
+ 
+ from nose.tools import eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -31,10 +32,16 @@ def teardown():
+ if 'csv' in mapnik.DatasourceCache.plugin_names():
+ 
+     def get_csv_ds(filename):
++        if not os.path.exists('../data/csv/'):
++            raise SkipTest
++
+         return mapnik.Datasource(
+             type='csv', file=os.path.join('../data/csv/', filename))
+ 
+     def test_broken_files(visual=False):
++        if not os.path.exists('../data/csv/'):
++            raise SkipTest
++
+         broken = glob.glob("../data/csv/fails/*.*")
+         broken.extend(glob.glob("../data/csv/warns/*.*"))
+ 
+@@ -50,6 +57,9 @@ if 'csv' in mapnik.DatasourceCache.plugi
+                     print('\x1b[1;32m✓ \x1b[0m', csv)
+ 
+     def test_good_files(visual=False):
++        if not os.path.exists('../data/csv/'):
++            raise SkipTest
++
+         good_files = glob.glob("../data/csv/*.*")
+         good_files.extend(glob.glob("../data/csv/warns/*.*"))
+         ignorable = os.path.join('..', 'data', 'csv', 'long_lat.vrt')
+@@ -508,6 +518,9 @@ if 'csv' in mapnik.DatasourceCache.plugi
+         get_csv_ds('more_column_values_than_headers.csv')
+ 
+     def test_that_feature_id_only_incremented_for_valid_rows(**kwargs):
++        if not os.path.exists(os.path.join('../data/csv/warns', 'feature_id_counting.csv')):
++            raise SkipTest
++
+         ds = mapnik.Datasource(type='csv',
+                                file=os.path.join('../data/csv/warns', 'feature_id_counting.csv'))
+         eq_(len(ds.fields()), 3)
+@@ -529,6 +542,9 @@ if 'csv' in mapnik.DatasourceCache.plugi
+         eq_(len(list(ds.all_features())), 2)
+ 
+     def test_dynamically_defining_headers1(**kwargs):
++        if not os.path.exists(os.path.join('../data/csv/fails', 'needs_headers_two_lines.csv')):
++            raise SkipTest
++
+         ds = mapnik.Datasource(type='csv',
+                                file=os.path.join(
+                                    '../data/csv/fails', 'needs_headers_two_lines.csv'),
+@@ -546,6 +562,9 @@ if 'csv' in mapnik.DatasourceCache.plugi
+         eq_(len(list(ds.all_features())), 2)
+ 
+     def test_dynamically_defining_headers2(**kwargs):
++        if not os.path.exists(os.path.join('../data/csv/fails', 'needs_headers_one_line.csv')):
++            raise SkipTest
++
+         ds = mapnik.Datasource(type='csv',
+                                file=os.path.join(
+                                    '../data/csv/fails', 'needs_headers_one_line.csv'),
+@@ -563,6 +582,9 @@ if 'csv' in mapnik.DatasourceCache.plugi
+         eq_(len(list(ds.all_features())), 1)
+ 
+     def test_dynamically_defining_headers3(**kwargs):
++        if not os.path.exists(os.path.join('../data/csv/fails', 'needs_headers_one_line_no_newline.csv')):
++            raise SkipTest
++
+         ds = mapnik.Datasource(type='csv',
+                                file=os.path.join(
+                                    '../data/csv/fails', 'needs_headers_one_line_no_newline.csv'),
+--- a/test/python_tests/datasource_test.py
++++ b/test/python_tests/datasource_test.py
+@@ -4,6 +4,7 @@ import sys
+ from itertools import groupby
+ 
+ from nose.tools import eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -69,6 +70,9 @@ def test_vrt_referring_to_missing_files(
+ 
+ def test_field_listing():
+     if 'shape' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/shp/poly.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/poly.shp')
+         fields = ds.fields()
+         eq_(fields, ['AREA', 'EAS_ID', 'PRFEDEA'])
+@@ -81,6 +85,9 @@ def test_field_listing():
+ 
+ def test_total_feature_count_shp():
+     if 'shape' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/shp/poly.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/poly.shp')
+         features = ds.all_features()
+         num_feats = len(list(features))
+@@ -89,6 +96,9 @@ def test_total_feature_count_shp():
+ 
+ def test_total_feature_count_json():
+     if 'ogr' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/json/points.geojson'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/json/points.geojson', layer_by_index=0)
+         desc = ds.describe()
+         eq_(desc['geometry_type'], mapnik.DataGeometryType.Point)
+@@ -102,6 +112,9 @@ def test_total_feature_count_json():
+ 
+ def test_sqlite_reading():
+     if 'sqlite' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(
+             file='../data/sqlite/world.sqlite',
+             table_by_index=0)
+@@ -116,6 +129,9 @@ def test_sqlite_reading():
+ 
+ 
+ def test_reading_json_from_string():
++    if not os.path.exists('../data/json/points.geojson'):
++        raise SkipTest
++
+     with open('../data/json/points.geojson', 'r') as f:
+         json = f.read()
+     if 'ogr' in mapnik.DatasourceCache.plugin_names():
+@@ -127,6 +143,9 @@ def test_reading_json_from_string():
+ 
+ def test_feature_envelope():
+     if 'shape' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/shp/poly.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/poly.shp')
+         features = ds.all_features()
+         for feat in features:
+@@ -139,6 +158,9 @@ def test_feature_envelope():
+ 
+ def test_feature_attributes():
+     if 'shape' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/shp/poly.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/poly.shp')
+         features = list(ds.all_features())
+         feat = features[0]
+@@ -150,6 +172,9 @@ def test_feature_attributes():
+ 
+ def test_ogr_layer_by_sql():
+     if 'ogr' in mapnik.DatasourceCache.plugin_names():
++        if not os.path.exists('../data/shp/poly.shp'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/shp/poly.shp',
+                         layer_by_sql='SELECT * FROM poly WHERE EAS_ID = 168')
+         features = ds.all_features()
+@@ -164,6 +189,9 @@ def test_hit_grid():
+         return ["%d:%s" % (len(list(group)), name)
+                 for name, group in groupby(l)]
+ 
++    if not os.path.exists('../data/good_maps/agg_poly_gamma_map.xml'):
++        raise SkipTest
++
+     m = mapnik.Map(256, 256)
+     try:
+         mapnik.load_map(m, '../data/good_maps/agg_poly_gamma_map.xml')
+--- a/test/python_tests/extra_map_props_test.py
++++ b/test/python_tests/extra_map_props_test.py
+@@ -4,6 +4,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -17,6 +18,9 @@ def setup():
+ 
+ 
+ def test_arbitrary_parameters_attached_to_map():
++    if not os.path.exists('../data/good_maps/extra_arbitary_map_parameters.xml'):
++        raise SkipTest
++
+     m = mapnik.Map(256, 256)
+     mapnik.load_map(m, '../data/good_maps/extra_arbitary_map_parameters.xml')
+     eq_(len(m.parameters), 5)
+--- a/test/python_tests/feature_id_test.py
++++ b/test/python_tests/feature_id_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -21,6 +22,9 @@ def setup():
+ 
+ 
+ def compare_shape_between_mapnik_and_ogr(shapefile, query=None):
++    if not os.path.exists(shapefile):
++        raise SkipTest
++
+     plugins = mapnik.DatasourceCache.plugin_names()
+     if 'shape' in plugins and 'ogr' in plugins:
+         ds1 = mapnik.Ogr(file=shapefile, layer_by_index=0)
+@@ -49,6 +53,9 @@ def test_shapefile_polygon_featureset_id
+ 
+ 
+ def test_shapefile_polygon_feature_query_id():
++    if not os.path.exists('../data/shp/world_merc.shp'):
++        raise SkipTest
++
+     bbox = (15523428.2632, 4110477.6323, -11218494.8310, 7495720.7404)
+     query = mapnik.Query(mapnik.Box2d(*bbox))
+     if 'ogr' in mapnik.DatasourceCache.plugin_names():
+--- a/test/python_tests/fontset_test.py
++++ b/test/python_tests/fontset_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -16,6 +17,9 @@ def setup():
+ 
+ 
+ def test_loading_fontset_from_map():
++    if not os.path.exists('../data/good_maps/fontset.xml'):
++        raise SkipTest
++
+     m = mapnik.Map(256, 256)
+     mapnik.load_map(m, '../data/good_maps/fontset.xml', True)
+     fs = m.find_fontset('book-fonts')
+--- a/test/python_tests/geojson_plugin_test.py
++++ b/test/python_tests/geojson_plugin_test.py
+@@ -4,6 +4,7 @@
+ import os
+ 
+ from nose.tools import assert_almost_equal, eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -18,6 +19,9 @@ def setup():
+ if 'geojson' in mapnik.DatasourceCache.plugin_names():
+ 
+     def test_geojson_init():
++        if not os.path.exists('../data/json/escaped.geojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='geojson',
+             file='../data/json/escaped.geojson')
+@@ -28,6 +32,9 @@ if 'geojson' in mapnik.DatasourceCache.p
+         assert_almost_equal(e.maxy, 41.480573, places=3)
+ 
+     def test_geojson_properties():
++        if not os.path.exists('../data/json/escaped.geojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='geojson',
+             file='../data/json/escaped.geojson')
+@@ -64,6 +71,9 @@ if 'geojson' in mapnik.DatasourceCache.p
+         eq_(f['NOM_FR'], u'Québec')
+ 
+     def test_large_geojson_properties():
++        if not os.path.exists('../data/json/escaped.geojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='geojson',
+             file='../data/json/escaped.geojson',
+@@ -115,6 +125,9 @@ if 'geojson' in mapnik.DatasourceCache.p
+ 
+ #    @raises(RuntimeError)
+     def test_that_nonexistant_query_field_throws(**kwargs):
++        if not os.path.exists('../data/json/escaped.geojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='geojson',
+             file='../data/json/escaped.geojson')
+@@ -131,6 +144,9 @@ if 'geojson' in mapnik.DatasourceCache.p
+ #        fs = ds.features(query)
+ 
+     def test_parsing_feature_collection_with_top_level_properties():
++        if not os.path.exists('../data/json/feature_collection_level_properties.json'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='geojson',
+             file='../data/json/feature_collection_level_properties.json')
+--- a/test/python_tests/image_filters_test.py
++++ b/test/python_tests/image_filters_test.py
+@@ -4,6 +4,7 @@ import os
+ import re
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -31,6 +32,9 @@ def test_append():
+ 
+ if 'shape' in mapnik.DatasourceCache.plugin_names():
+     def test_style_level_image_filter():
++        if not os.path.exists('../data/good_maps/style_level_image_filter.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/style_level_image_filter.xml')
+         m.zoom_all()
+--- a/test/python_tests/image_test.py
++++ b/test/python_tests/image_test.py
+@@ -5,6 +5,7 @@ import os
+ import sys
+ 
+ from nose.tools import assert_almost_equal, eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -370,6 +371,9 @@ def test_png_round_trip():
+ 
+ 
+ def test_image_open_from_string():
++    if not os.path.exists('../data/images/dummy.png'):
++        raise SkipTest
++
+     filepath = '../data/images/dummy.png'
+     im1 = mapnik.Image.open(filepath)
+     with open(filepath, READ_FLAGS) as f:
+--- a/test/python_tests/image_tiff_test.py
++++ b/test/python_tests/image_tiff_test.py
+@@ -5,6 +5,7 @@ import hashlib
+ import os
+ 
+ from nose.tools import assert_not_equal, eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -208,6 +209,9 @@ def test_tiff_round_trip_tiled():
+ 
+ 
+ def test_tiff_rgb8_compare():
++    if not os.path.exists('../data/tiff/ndvi_256x256_rgb8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_rgb8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-rgb8.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -223,6 +227,9 @@ def test_tiff_rgb8_compare():
+ 
+ 
+ def test_tiff_rgba8_compare_scanline():
++    if not os.path.exists('../data/tiff/ndvi_256x256_rgba8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_rgba8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-rgba8-scanline.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -239,6 +246,9 @@ def test_tiff_rgba8_compare_scanline():
+ 
+ 
+ def test_tiff_rgba8_compare_stripped():
++    if not os.path.exists('../data/tiff/ndvi_256x256_rgba8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_rgba8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-rgba8-stripped.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -255,6 +265,9 @@ def test_tiff_rgba8_compare_stripped():
+ 
+ 
+ def test_tiff_rgba8_compare_tiled():
++    if not os.path.exists('../data/tiff/ndvi_256x256_rgba8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_rgba8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-rgba8-tiled.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -271,6 +284,9 @@ def test_tiff_rgba8_compare_tiled():
+ 
+ 
+ def test_tiff_gray8_compare_scanline():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray8-scanline.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -287,6 +303,9 @@ def test_tiff_gray8_compare_scanline():
+ 
+ 
+ def test_tiff_gray8_compare_stripped():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray8-stripped.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -303,6 +322,9 @@ def test_tiff_gray8_compare_stripped():
+ 
+ 
+ def test_tiff_gray8_compare_tiled():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray8_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray8_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray8-tiled.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -319,6 +341,9 @@ def test_tiff_gray8_compare_tiled():
+ 
+ 
+ def test_tiff_gray16_compare_scanline():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray16_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray16_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray16-scanline.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -335,6 +360,9 @@ def test_tiff_gray16_compare_scanline():
+ 
+ 
+ def test_tiff_gray16_compare_stripped():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray16_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray16_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray16-stripped.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -351,6 +379,9 @@ def test_tiff_gray16_compare_stripped():
+ 
+ 
+ def test_tiff_gray16_compare_tiled():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray16_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray16_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray16-tiled.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -367,6 +398,9 @@ def test_tiff_gray16_compare_tiled():
+ 
+ 
+ def test_tiff_gray32f_compare_scanline():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray32f_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray32f_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray32f-scanline.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -383,6 +417,9 @@ def test_tiff_gray32f_compare_scanline()
+ 
+ 
+ def test_tiff_gray32f_compare_stripped():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray32f_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray32f_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray32f-stripped.tiff'
+     im = mapnik.Image.open(filepath1)
+@@ -399,6 +436,9 @@ def test_tiff_gray32f_compare_stripped()
+ 
+ 
+ def test_tiff_gray32f_compare_tiled():
++    if not os.path.exists('../data/tiff/ndvi_256x256_gray32f_striped.tif'):
++        raise SkipTest
++
+     filepath1 = '../data/tiff/ndvi_256x256_gray32f_striped.tif'
+     filepath2 = '/tmp/mapnik-tiff-gray32f-tiled.tiff'
+     im = mapnik.Image.open(filepath1)
+--- a/test/python_tests/layer_buffer_size_test.py
++++ b/test/python_tests/layer_buffer_size_test.py
+@@ -2,6 +2,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -19,6 +20,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     # override the postive map buffer leading
+     # only one point to be rendered in the map
+     def test_layer_buffer_size_1():
++        if not os.path.exists('../data/good_maps/layer_buffer_size_reduction.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         eq_(m.buffer_size, 0)
+         mapnik.load_map(m, '../data/good_maps/layer_buffer_size_reduction.xml')
+--- a/test/python_tests/layer_modification_test.py
++++ b/test/python_tests/layer_modification_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -16,6 +17,9 @@ def setup():
+ 
+ 
+ def test_adding_datasource_to_layer():
++    if not os.path.exists('../data/shp/world_merc.shp'):
++        raise SkipTest
++
+     map_string = '''<?xml version="1.0" encoding="utf-8"?>
+ <Map>
+ 
+--- a/test/python_tests/map_query_test.py
++++ b/test/python_tests/map_query_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import assert_almost_equal, eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -43,6 +44,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+     # map has never been zoomed (even with data)
+     @raises(RuntimeError)
+     def test_map_query_throw4():
++        if not os.path.exists('../data/good_maps/agg_poly_gamma_map.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/agg_poly_gamma_map.xml')
+         m.query_point(0, 0, 0)
+@@ -50,12 +54,18 @@ if 'shape' in mapnik.DatasourceCache.plu
+     # invalid coords in general (do not intersect)
+     @raises(RuntimeError)
+     def test_map_query_throw5():
++        if not os.path.exists('../data/good_maps/agg_poly_gamma_map.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/agg_poly_gamma_map.xml')
+         m.zoom_all()
+         m.query_point(0, 9999999999999999, 9999999999999999)
+ 
+     def test_map_query_works1():
++        if not os.path.exists('../data/good_maps/wgs842merc_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/wgs842merc_reprojection.xml')
+         merc_bounds = mapnik.Box2d(-20037508.34, -
+@@ -68,6 +78,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         eq_(feat.attributes['NAME_FORMA'], u'United States of America')
+ 
+     def test_map_query_works2():
++        if not os.path.exists('../data/good_maps/merc2wgs84_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/merc2wgs84_reprojection.xml')
+         wgs84_bounds = mapnik.Box2d(-179.999999975, -
+@@ -87,6 +100,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         eq_(feat.attributes['NAME'], u'United States')
+ 
+     def test_map_query_in_pixels_works1():
++        if not os.path.exists('../data/good_maps/wgs842merc_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/wgs842merc_reprojection.xml')
+         merc_bounds = mapnik.Box2d(-20037508.34, -
+@@ -98,6 +114,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         eq_(feat.attributes['NAME_FORMA'], u'United States of America')
+ 
+     def test_map_query_in_pixels_works2():
++        if not os.path.exists('../data/good_maps/merc2wgs84_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/merc2wgs84_reprojection.xml')
+         wgs84_bounds = mapnik.Box2d(-179.999999975, -
+--- a/test/python_tests/markers_complex_rendering_test.py
++++ b/test/python_tests/markers_complex_rendering_test.py
+@@ -2,6 +2,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -15,6 +16,9 @@ def setup():
+ 
+ if 'csv' in mapnik.DatasourceCache.plugin_names():
+     def test_marker_ellipse_render1():
++        if not os.path.exists('../data/good_maps/marker_ellipse_transform.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/marker_ellipse_transform.xml')
+         m.zoom_all()
+@@ -32,6 +36,9 @@ if 'csv' in mapnik.DatasourceCache.plugi
+                                                                 'test/python_tests/' + expected))
+ 
+     def test_marker_ellipse_render2():
++        if not os.path.exists('../data/good_maps/marker_ellipse_transform2.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/marker_ellipse_transform2.xml')
+         m.zoom_all()
+--- a/test/python_tests/ogr_and_shape_geometries_test.py
++++ b/test/python_tests/ogr_and_shape_geometries_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -30,6 +31,9 @@ plugins = mapnik.DatasourceCache.plugin_
+ if 'shape' in plugins and 'ogr' in plugins:
+ 
+     def ensure_geometries_are_interpreted_equivalently(filename):
++        if not os.path.exists(filename):
++            raise SkipTest
++
+         ds1 = mapnik.Ogr(file=filename, layer_by_index=0)
+         ds2 = mapnik.Shapefile(file=filename)
+         fs1 = ds1.featureset()
+--- a/test/python_tests/ogr_test.py
++++ b/test/python_tests/ogr_test.py
+@@ -4,6 +4,7 @@
+ import os
+ 
+ from nose.tools import assert_almost_equal, eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -24,6 +25,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+ 
+     # Shapefile initialization
+     def test_shapefile_init():
++        if not os.path.exists('../data/shp/boundaries.shp'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/shp/boundaries.shp', layer_by_index=0)
+         e = ds.envelope()
+         assert_almost_equal(e.minx, -11121.6896651, places=7)
+@@ -36,6 +40,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+ 
+     # Shapefile properties
+     def test_shapefile_properties():
++        if not os.path.exists('../data/shp/boundaries.shp'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/shp/boundaries.shp', layer_by_index=0)
+         f = list(ds.features_at_point(ds.envelope().center(), 0.001))[0]
+         eq_(ds.geometry_type(), mapnik.DataGeometryType.Polygon)
+@@ -56,6 +63,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+ 
+     @raises(RuntimeError)
+     def test_that_nonexistant_query_field_throws(**kwargs):
++        if not os.path.exists('../data/shp/world_merc.shp'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/shp/world_merc.shp', layer_by_index=0)
+         eq_(len(ds.fields()), 11)
+         eq_(ds.fields(), ['FIPS', 'ISO2', 'ISO3', 'UN', 'NAME',
+@@ -87,6 +97,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+ 
+     # OGR plugin extent parameter
+     def test_ogr_extent_parameter():
++        if not os.path.exists('../data/shp/world_merc.shp'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(
+             file='../data/shp/world_merc.shp',
+             layer_by_index=0,
+@@ -101,6 +114,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+         eq_('+proj=merc' in meta['proj4'], True)
+ 
+     def test_ogr_reading_gpx_waypoint():
++        if not os.path.exists('../data/gpx/empty.gpx'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/gpx/empty.gpx', layer='waypoints')
+         e = ds.envelope()
+         eq_(e.minx, -122)
+@@ -112,6 +128,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+         eq_('+proj=longlat' in meta['proj4'], True)
+ 
+     def test_ogr_empty_data_should_not_throw():
++        if not os.path.exists('../data/gpx/empty.gpx'):
++            raise SkipTest
++
+         default_logging_severity = mapnik.logger.get_severity()
+         mapnik.logger.set_severity(getattr(mapnik.severity_type, "None"))
+         # use logger to silence expected warnings
+@@ -134,6 +153,9 @@ if 'ogr' in mapnik.DatasourceCache.plugi
+     #    eq_(len(fs),1)
+ 
+     def test_geometry_type():
++        if not os.path.exists('../data/csv/wkt.csv'):
++            raise SkipTest
++
+         ds = mapnik.Ogr(file='../data/csv/wkt.csv', layer_by_index=0)
+         e = ds.envelope()
+         assert_almost_equal(e.minx, 1.0, places=1)
+--- a/test/python_tests/palette_test.py
++++ b/test/python_tests/palette_test.py
+@@ -5,6 +5,7 @@ import os
+ import sys
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -26,6 +27,9 @@ expected_rgb = '[Palette 2 colors #ff00f
+ 
+ 
+ def test_reading_palettes():
++    if not os.path.exists('../data/palettes/palette64.act') or not os.path.exists('../data/palettes/palette256.act'):
++        raise SkipTest
++
+     with open('../data/palettes/palette64.act', 'rb') as act:
+         palette = mapnik.Palette(act.read(), 'act')
+     eq_(palette.to_string(), expected_64)
+@@ -41,6 +45,9 @@ def test_reading_palettes():
+ if 'shape' in mapnik.DatasourceCache.plugin_names():
+ 
+     def test_render_with_palette():
++        if not os.path.exists('../data/good_maps/agg_poly_gamma_map.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(600, 400)
+         mapnik.load_map(m, '../data/good_maps/agg_poly_gamma_map.xml')
+         m.zoom_all()
+--- a/test/python_tests/png_encoding_test.py
++++ b/test/python_tests/png_encoding_test.py
+@@ -4,6 +4,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -152,6 +153,9 @@ if mapnik.has_png():
+         eq_(t0_len < t1_len < t2_len, True)
+ 
+     def test_transparency_levels_aerial():
++        if not os.path.exists('../data/images/12_654_1580.png'):
++            raise SkipTest
++
+         im = mapnik.Image.open('../data/images/12_654_1580.png')
+         im_in = mapnik.Image.open(
+             './images/support/transparency/aerial_rgba.png')
+--- a/test/python_tests/pngsuite_test.py
++++ b/test/python_tests/pngsuite_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import assert_raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -26,6 +27,9 @@ def assert_good_file(fname):
+ 
+ 
+ def get_pngs(good):
++    if not os.path.exists(datadir):
++        raise SkipTest
++
+     files = [x for x in os.listdir(datadir) if x.endswith('.png')]
+     return [os.path.join(datadir, x)
+             for x in files if good != x.startswith('x')]
+--- a/test/python_tests/query_tolerance_test.py
++++ b/test/python_tests/query_tolerance_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -16,6 +17,9 @@ def setup():
+ 
+ if 'shape' in mapnik.DatasourceCache.plugin_names():
+     def test_query_tolerance():
++        if not os.path.exists('../data/shp/arrows.shp'):
++            raise SkipTest
++
+         srs = '+init=epsg:4326'
+         lyr = mapnik.Layer('test')
+         ds = mapnik.Shapefile(file='../data/shp/arrows.shp')
+--- a/test/python_tests/raster_symbolizer_test.py
++++ b/test/python_tests/raster_symbolizer_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -16,6 +17,9 @@ def setup():
+ 
+ 
+ def test_dataraster_coloring():
++    if not os.path.exists('../data/raster/dataraster.tif'):
++        raise SkipTest
++
+     srs = '+init=epsg:32630'
+     lyr = mapnik.Layer('dataraster')
+     if 'gdal' in mapnik.DatasourceCache.plugin_names():
+@@ -72,6 +76,9 @@ def test_dataraster_coloring():
+ 
+ 
+ def test_dataraster_query_point():
++    if not os.path.exists('../data/raster/dataraster.tif'):
++        raise SkipTest
++
+     srs = '+init=epsg:32630'
+     lyr = mapnik.Layer('dataraster')
+     if 'gdal' in mapnik.DatasourceCache.plugin_names():
+@@ -106,6 +113,9 @@ def test_dataraster_query_point():
+ 
+ 
+ def test_load_save_map():
++    if not os.path.exists('../data/good_maps/raster_symbolizer.xml'):
++        raise SkipTest
++
+     map = mapnik.Map(256, 256)
+     in_map = "../data/good_maps/raster_symbolizer.xml"
+     try:
+@@ -122,6 +132,9 @@ def test_load_save_map():
+ 
+ 
+ def test_raster_with_alpha_blends_correctly_with_background():
++    if not os.path.exists('../data/raster/white-alpha.png'):
++        raise SkipTest
++
+     WIDTH = 500
+     HEIGHT = 500
+ 
+@@ -157,6 +170,9 @@ def test_raster_with_alpha_blends_correc
+ 
+ 
+ def test_raster_warping():
++    if not os.path.exists('../data/raster/dataraster.tif'):
++        raise SkipTest
++
+     lyrSrs = "+init=epsg:32630"
+     mapSrs = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
+     lyr = mapnik.Layer('dataraster', lyrSrs)
+@@ -198,6 +214,9 @@ def test_raster_warping():
+ 
+ 
+ def test_raster_warping_does_not_overclip_source():
++    if not os.path.exists('../data/raster/dataraster.tif'):
++        raise SkipTest
++
+     lyrSrs = "+init=epsg:32630"
+     mapSrs = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
+     lyr = mapnik.Layer('dataraster', lyrSrs)
+--- a/test/python_tests/render_test.py
++++ b/test/python_tests/render_test.py
+@@ -6,6 +6,7 @@ import sys
+ import tempfile
+ 
+ from nose.tools import eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -126,6 +127,9 @@ def get_paired_images(w, h, mapfile):
+ 
+ 
+ def test_render_from_serialization():
++    if not os.path.exists('../data/good_maps/building_symbolizer.xml') or not os.path.exists('../data/good_maps/polygon_symbolizer.xml'):
++        raise SkipTest
++
+     try:
+         im, im2 = get_paired_images(
+             100, 100, '../data/good_maps/building_symbolizer.xml')
+@@ -263,6 +267,9 @@ def test_render_with_detector():
+ if 'shape' in mapnik.DatasourceCache.plugin_names():
+ 
+     def test_render_with_scale_factor():
++        if not os.path.exists('../data/good_maps/marker-text-line.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(256, 256)
+         mapnik.load_map(m, '../data/good_maps/marker-text-line.xml')
+         m.zoom_all()
+--- a/test/python_tests/reprojection_test.py
++++ b/test/python_tests/reprojection_test.py
+@@ -2,6 +2,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -17,11 +18,17 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     #@raises(RuntimeError)
+     def test_zoom_all_will_fail():
++        if not os.path.exists('../data/good_maps/wgs842merc_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(m, '../data/good_maps/wgs842merc_reprojection.xml')
+         m.zoom_all()
+ 
+     def test_zoom_all_will_work_with_max_extent():
++        if not os.path.exists('../data/good_maps/wgs842merc_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(m, '../data/good_maps/wgs842merc_reprojection.xml')
+         merc_bounds = mapnik.Box2d(-20037508.34, -
+@@ -39,6 +46,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         # eq_(m.envelope(),merc_bounds)
+ 
+     def test_visual_zoom_all_rendering1():
++        if not os.path.exists('../data/good_maps/wgs842merc_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(m, '../data/good_maps/wgs842merc_reprojection.xml')
+         merc_bounds = mapnik.Box2d(-20037508.34, -
+@@ -57,6 +67,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+                                                                 'test/python_tests/' + expected))
+ 
+     def test_visual_zoom_all_rendering2():
++        if not os.path.exists('../data/good_maps/wgs842merc_reprojection.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(m, '../data/good_maps/merc2wgs84_reprojection.xml')
+         m.zoom_all()
+@@ -73,6 +86,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # maximum-extent read from map.xml
+     def test_visual_zoom_all_rendering3():
++        if not os.path.exists('../data/good_maps/bounds_clipping.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(m, '../data/good_maps/bounds_clipping.xml')
+         m.zoom_all()
+@@ -89,6 +105,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # no maximum-extent
+     def test_visual_zoom_all_rendering4():
++        if not os.path.exists('../data/good_maps/bounds_clipping.xml'):
++            raise SkipTest
++
+         m = mapnik.Map(512, 512)
+         mapnik.load_map(m, '../data/good_maps/bounds_clipping.xml')
+         m.maximum_extent = None
+--- a/test/python_tests/save_map_test.py
++++ b/test/python_tests/save_map_test.py
+@@ -5,6 +5,7 @@ import os
+ import tempfile
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -70,6 +71,9 @@ def compare_map(xml):
+ 
+ 
+ def test_compare_map():
++    if not os.path.exists('../data/good_maps/'):
++        raise SkipTest
++
+     good_maps = glob.glob("../data/good_maps/*.xml")
+     good_maps = [os.path.normpath(p) for p in good_maps]
+     # remove one map that round trips CDATA differently, but this is okay
+@@ -85,6 +89,9 @@ def test_compare_map():
+ 
+ 
+ def test_compare_map_deprecations():
++    if not os.path.exists('../data/deprecated_maps/'):
++        raise SkipTest
++
+     dep = glob.glob("../data/deprecated_maps/*.xml")
+     dep = [os.path.normpath(p) for p in dep]
+     for m in dep:
+--- a/test/python_tests/shapefile_test.py
++++ b/test/python_tests/shapefile_test.py
+@@ -4,6 +4,7 @@
+ import os
+ 
+ from nose.tools import assert_almost_equal, eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -19,6 +20,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # Shapefile initialization
+     def test_shapefile_init():
++        if not os.path.exists('../data/shp/boundaries'):
++            raise SkipTest
++
+         s = mapnik.Shapefile(file='../data/shp/boundaries')
+ 
+         e = s.envelope()
+@@ -30,6 +34,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # Shapefile properties
+     def test_shapefile_properties():
++        if not os.path.exists('../data/shp/boundaries'):
++            raise SkipTest
++
+         s = mapnik.Shapefile(file='../data/shp/boundaries', encoding='latin1')
+         f = list(s.features_at_point(s.envelope().center()))[0]
+ 
+@@ -45,6 +52,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     @raises(RuntimeError)
+     def test_that_nonexistant_query_field_throws(**kwargs):
++        if not os.path.exists('../data/shp/world_merc'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/world_merc')
+         eq_(len(ds.fields()), 11)
+         eq_(ds.fields(), ['FIPS', 'ISO2', 'ISO3', 'UN', 'NAME',
+@@ -69,6 +79,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         ds.features(query)
+ 
+     def test_dbf_logical_field_is_boolean():
++        if not os.path.exists('../data/shp/long_lat'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/long_lat')
+         eq_(len(ds.fields()), 7)
+         eq_(ds.fields(), ['LONG', 'LAT', 'LOGICAL_TR',
+@@ -90,6 +103,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # created by hand in qgis 1.8.0
+     def test_shapefile_point2d_from_qgis():
++        if not os.path.exists('../data/shp/points/qgis.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/points/qgis.shp')
+         eq_(len(ds.fields()), 2)
+         eq_(ds.fields(), ['id', 'name'])
+@@ -99,6 +115,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+     # ogr2ogr tests/data/shp/3dpoint/ogr_zfield.shp
+     # tests/data/shp/3dpoint/qgis.shp -zfield id
+     def test_shapefile_point_z_from_qgis():
++        if not os.path.exists('../data/shp/points/ogr_zfield.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/points/ogr_zfield.shp')
+         eq_(len(ds.fields()), 2)
+         eq_(ds.fields(), ['id', 'name'])
+@@ -106,6 +125,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+         eq_(len(list(ds.all_features())), 3)
+ 
+     def test_shapefile_multipoint_from_qgis():
++        if not os.path.exists('../data/shp/points/qgis_multi.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/points/qgis_multi.shp')
+         eq_(len(ds.fields()), 2)
+         eq_(ds.fields(), ['id', 'name'])
+@@ -114,6 +136,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # pointzm from arcinfo
+     def test_shapefile_point_zm_from_arcgis():
++        if not os.path.exists('../data/shp/points/poi.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/points/poi.shp')
+         eq_(len(ds.fields()), 7)
+         eq_(ds.fields(),
+@@ -130,6 +155,9 @@ if 'shape' in mapnik.DatasourceCache.plu
+ 
+     # copy of the above with ogr2ogr that makes m record 14 instead of 18
+     def test_shapefile_point_zm_from_ogr():
++        if not os.path.exists('../data/shp/points/poi_ogr.shp'):
++            raise SkipTest
++
+         ds = mapnik.Shapefile(file='../data/shp/points/poi_ogr.shp')
+         eq_(len(ds.fields()), 7)
+         eq_(ds.fields(),
+--- a/test/python_tests/shapeindex_test.py
++++ b/test/python_tests/shapeindex_test.py
+@@ -6,6 +6,7 @@ import shutil
+ from subprocess import PIPE, Popen
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -19,6 +20,9 @@ def setup():
+ 
+ 
+ def test_shapeindex():
++    if not os.path.exists('../data/shp/'):
++        raise SkipTest
++
+     # first copy shapefiles to tmp directory
+     source_dir = '../data/shp/'
+     working_dir = '/tmp/mapnik-shp-tmp/'
+--- a/test/python_tests/sqlite_test.py
++++ b/test/python_tests/sqlite_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_, raises
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -23,6 +24,9 @@ def teardown():
+ if 'sqlite' in mapnik.DatasourceCache.plugin_names():
+ 
+     def test_attachdb_with_relative_file():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         # The point table and index is in the qgis_spatiallite.sqlite
+         # database.  If either is not found, then this fails
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+@@ -36,6 +40,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_relative_file.requires_data = True
+ 
+     def test_attachdb_with_multiple_files():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+                            table='attachedtest',
+                            attachdb='scratch1@:memory:,scratch2@:memory:',
+@@ -57,6 +64,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_multiple_files.requires_data = True
+ 
+     def test_attachdb_with_absolute_file():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         # The point table and index is in the qgis_spatiallite.sqlite
+         # database.  If either is not found, then this fails
+         ds = mapnik.SQLite(file=os.getcwd() + '/../data/sqlite/world.sqlite',
+@@ -70,6 +80,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_absolute_file.requires_data = True
+ 
+     def test_attachdb_with_index():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+                            table='attachedtest',
+                            attachdb='scratch@:memory:',
+@@ -91,6 +104,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_index.requires_data = True
+ 
+     def test_attachdb_with_explicit_index():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+                            table='attachedtest',
+                            index_table='myindex',
+@@ -112,6 +128,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_explicit_index.requires_data = True
+ 
+     def test_attachdb_with_sql_join():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+                            table='(select * from world_merc INNER JOIN business on world_merc.iso3 = business.ISO3 limit 100)',
+                            attachdb='busines@business.sqlite'
+@@ -223,6 +242,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_sql_join.requires_data = True
+ 
+     def test_attachdb_with_sql_join_count():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+                            table='(select * from world_merc INNER JOIN business on world_merc.iso3 = business.ISO3 limit 100)',
+                            attachdb='busines@business.sqlite'
+@@ -293,6 +315,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_sql_join_count.requires_data = True
+ 
+     def test_attachdb_with_sql_join_count2():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         '''
+         sqlite3 world.sqlite
+         attach database 'business.sqlite' as business;
+@@ -368,6 +393,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_sql_join_count2.requires_data = True
+ 
+     def test_attachdb_with_sql_join_count3():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         '''
+         select count(*) from (select * from world_merc where 1=1) as world_merc INNER JOIN business on world_merc.iso3 = business.ISO3;
+         '''
+@@ -441,6 +469,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_sql_join_count3.requires_data = True
+ 
+     def test_attachdb_with_sql_join_count4():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         '''
+         select count(*) from (select * from world_merc where 1=1) as world_merc INNER JOIN business on world_merc.iso3 = business.ISO3;
+         '''
+@@ -514,6 +545,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_sql_join_count4.requires_data = True
+ 
+     def test_attachdb_with_sql_join_count5():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         '''
+         select count(*) from (select * from world_merc where 1=1) as world_merc INNER JOIN business on world_merc.iso3 = business.ISO3;
+         '''
+@@ -555,6 +589,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_attachdb_with_sql_join_count5.requires_data = True
+ 
+     def test_subqueries():
++        if not os.path.exists('../data/sqlite/world.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/world.sqlite',
+                            table='world_merc',
+                            )
+@@ -629,6 +666,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_subqueries.requires_data = True
+ 
+     def test_empty_db():
++        if not os.path.exists('../data/sqlite/empty.db'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/empty.db',
+                            table='empty',
+                            )
+@@ -644,6 +684,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+ 
+     @raises(RuntimeError)
+     def test_that_nonexistant_query_field_throws(**kwargs):
++        if not os.path.exists('../data/sqlite/empty.db'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/empty.db',
+                            table='empty',
+                            )
+@@ -710,6 +753,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_that_nonexistant_query_field_throws.requires_data = True
+ 
+     def test_intersects_token1():
++        if not os.path.exists('../data/sqlite/empty.db'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/empty.db',
+                            table='(select * from empty where !intersects!)',
+                            )
+@@ -724,6 +770,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_intersects_token1.requires_data = True
+ 
+     def test_intersects_token2():
++        if not os.path.exists('../data/sqlite/empty.db'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/empty.db',
+                            table='(select * from empty where "a"!="b" and !intersects!)',
+                            )
+@@ -738,6 +787,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+     test_intersects_token2.requires_data = True
+ 
+     def test_intersects_token3():
++        if not os.path.exists('../data/sqlite/empty.db'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/empty.db',
+                            table='(select * from empty where "a"!="b" and !intersects!)',
+                            )
+@@ -815,6 +867,9 @@ if 'sqlite' in mapnik.DatasourceCache.pl
+         eq_(ds.field_types(), ['int', 'str', 'int'])
+ 
+     def test_that_64bit_int_fields_work():
++        if not os.path.exists('../data/sqlite/64bit_int.sqlite'):
++            raise SkipTest
++
+         ds = mapnik.SQLite(file='../data/sqlite/64bit_int.sqlite',
+                            table='int_table',
+                            use_spatial_index=False
+--- a/test/python_tests/topojson_plugin_test.py
++++ b/test/python_tests/topojson_plugin_test.py
+@@ -5,6 +5,7 @@ from __future__ import absolute_import,
+ import os
+ 
+ from nose.tools import assert_almost_equal, eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ 
+@@ -19,6 +20,9 @@ def setup():
+ if 'topojson' in mapnik.DatasourceCache.plugin_names():
+ 
+     def test_topojson_init():
++        if not os.path.exists('../data/topojson/escaped.topojson'):
++            raise SkipTest
++
+         # topojson tests/data/json/escaped.geojson -o tests/data/topojson/escaped.topojson --properties
+         # topojson version 1.4.2
+         ds = mapnik.Datasource(
+@@ -31,6 +35,9 @@ if 'topojson' in mapnik.DatasourceCache.
+         assert_almost_equal(e.maxy, 41.480573, places=3)
+ 
+     def test_topojson_properties():
++        if not os.path.exists('../data/topojson/escaped.topojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='topojson',
+             file='../data/topojson/escaped.topojson')
+@@ -67,6 +74,9 @@ if 'topojson' in mapnik.DatasourceCache.
+         eq_(f['NOM_FR'], u'Québec')
+ 
+     def test_geojson_from_in_memory_string():
++        if not os.path.exists('../data/topojson/escaped.topojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='topojson',
+             inline=open(
+@@ -89,6 +99,9 @@ if 'topojson' in mapnik.DatasourceCache.
+ 
+ #    @raises(RuntimeError)
+     def test_that_nonexistant_query_field_throws(**kwargs):
++        if not os.path.exists('../data/topojson/escaped.topojson'):
++            raise SkipTest
++
+         ds = mapnik.Datasource(
+             type='topojson',
+             file='../data/topojson/escaped.topojson')
+--- a/test/python_tests/pdf_printing_test.py
++++ b/test/python_tests/pdf_printing_test.py
+@@ -3,6 +3,7 @@
+ import os
+ 
+ from nose.tools import eq_
++from nose.plugins.skip import SkipTest
+ 
+ import mapnik
+ from .utilities import execution_path, run_all
+@@ -34,6 +35,9 @@ if mapnik.has_pycairo():
+ 	import mapnik.printing
+ 
+ 	def test_pdf_printing():
++                if not os.path.exists('../data/good_maps/marker-text-line.xml'):
++                    raise SkipTest
++
+ 		source_xml = '../data/good_maps/marker-text-line.xml'.encode('utf-8')
+ 		m = make_map_from_xml(source_xml)
+ 

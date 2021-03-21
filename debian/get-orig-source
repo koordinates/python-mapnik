@@ -1,0 +1,19 @@
+#!/bin/bash
+
+REMOTE=upstream
+BRANCH=${REMOTE}/v3.0.x
+
+if [ $(git remote show ${REMOTE} | wc -l) -eq 0 ]; then
+	git remote add ${REMOTE} https://github.com/mapnik/python-mapnik.git
+fi
+
+git fetch ${REMOTE} --no-tags
+
+PACKAGE=$(dpkg-parsechangelog | grep ^Source: | awk '{print $2}')
+
+COMMIT=$(git log -n1 --format=format:%h ${BRANCH})
+DATE=$(date +%Y%m%d --date="@$(git log -n1 --format=format:%ct ${BRANCH})")
+
+VERSION="0.0~${DATE}-${COMMIT}"
+
+git archive --format=tar.gz --prefix=${PACKAGE}-${VERSION}/ -o ../${PACKAGE}_${VERSION}.orig.tar.gz ${BRANCH}

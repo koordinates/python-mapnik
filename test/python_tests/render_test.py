@@ -284,6 +284,62 @@ if 'shape' in mapnik.DatasourceCache.plugin_names():
                 'failed comparing actual (%s) and expected (%s)' % (actual_file,
                                                                     expected_file))
 
+if 'gdal' in mapnik.DatasourceCache.plugin_names() and mapnik.has_pycairo():
+    import cairo
+
+    def test_render_with_preserve_resolution():
+        m = mapnik.Map(100, 100)
+        s = mapnik.Style()
+        r = mapnik.Rule()
+        r.symbols.append(mapnik.RasterSymbolizer())
+        s.rules.append(r)
+        m.append_style('raster_style',s)
+
+        img_src = '../data/raster/snow-cover.tif'
+        img_dst_normal = '/tmp/snow-cover-normal.pdf'
+        img_dst_original = '/tmp/snow-cover-original.pdf'
+
+        lyr = mapnik.Layer('snow-cover')
+        ds = mapnik.Gdal(file=img_src)
+        lyr.datasource = ds
+        lyr.styles.append('raster_style')
+        m.layers.append(lyr)
+        m.zoom_all()
+        
+        pt_size = 0.0254/72.0
+        pagesize = (0.21, 0.297)
+
+        # original res
+        surface_original = cairo.PDFSurface(img_dst_original, pagesize[0] / pt_size, pagesize[1] / pt_size)
+        ctx_original = cairo.Context(surface_original)
+        scale_factor = 1.0
+        offset_x = 0
+        offset_y = 0
+        preserve_im_resolution = True
+        mapnik.render(m, ctx_original, scale_factor, offset_x, offset_y, preserve_im_resolution)
+        surface_original.finish()
+
+        # upsampled
+        surface_normal = cairo.PDFSurface(img_dst_normal, pagesize[0] / pt_size, pagesize[1] / pt_size)
+        ctx_normal = cairo.Context(surface_normal)
+        preserve_im_resolution = False
+        mapnik.render(m, ctx_normal, scale_factor, offset_x, offset_y, preserve_im_resolution)
+        surface_normal.finish()
+
+        normal_size = os.path.getsize(img_dst_normal)
+        original_size = os.path.getsize(img_dst_original)
+
+        # snow-cover.tif res is 22 x 21 (px) which means it will upsampled to fit the map size (100, 100)
+        # and will carry more data than the rendered file at original resolution
+        # im_dst_normal size is expected to be bigger than im_dst_original
+        eq_(normal_size > original_size, True)
+
+        try:
+            os.remove(img_dst_normal)
+            os.remove(img_dst_original)
+        except OSError:
+            pass
+
 if __name__ == "__main__":
     setup()
     exit(run_all(eval(x) for x in dir() if x.startswith("test_")))

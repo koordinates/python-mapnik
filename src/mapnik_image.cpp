@@ -482,5 +482,4 @@ void export_image()
         .staticmethod("from_cairo")
 #endif
         ;
-
 }

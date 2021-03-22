@@ -405,6 +405,20 @@ void render6(mapnik::Map const& map, PycairoContext* py_context)
     mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context);
     ren.apply();
 }
+
+void render7(mapnik::Map const& map,
+             PycairoContext* py_context,
+             double scale_factor = 1.0,
+             unsigned offset_x = 0,
+             unsigned offset_y = 0,
+             bool preserve_images_resolution = false)
+{
+    python_unblock_auto_block b;
+    mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
+    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map, context, scale_factor, offset_x, offset_y, preserve_images_resolution);
+    ren.apply();
+}
+
 void render_with_detector2(
     mapnik::Map const& map,
     PycairoContext* py_context,
@@ -925,6 +939,7 @@ BOOST_PYTHON_MODULE(_mapnik)
         "Usage:\n"
         ">>> from mapnik import Map, render, load_map\n"
         ">>> from cairo import SVGSurface, Context\n"
+        ">>> m = Map(256,256)\n"
         ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
         ">>> ctx = Context(surface)\n"
         ">>> load_map(m,'mapfile.xml')\n"
@@ -939,10 +954,26 @@ BOOST_PYTHON_MODULE(_mapnik)
         "Usage:\n"
         ">>> from mapnik import Map, render, load_map\n"
         ">>> from cairo import SVGSurface, Context\n"
+        ">>> m = Map(256,256)\n"
         ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
         ">>> ctx = Context(surface)\n"
         ">>> load_map(m,'mapfile.xml')\n"
         ">>> render(m,context)\n"
+        "\n"
+        );
+    
+    def("render",&render7,
+        "\n"
+        "Render Map to Cairo Context\n"
+        "\n"
+        "Usage:\n"
+        ">>> from mapnik import Map, render, load_map\n"
+        ">>> from cairo import SVGSurface, Context\n"
+        ">>> m = Map(256,256)\n"
+        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
+        ">>> ctx = Context(surface)\n"
+        ">>> load_map(m, 'mapfile.xml')\n"
+        ">>> render(m, context, 1.0, 0, 0, True)\n"
         "\n"
         );
 

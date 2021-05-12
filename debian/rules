@@ -8,6 +8,10 @@
 export DEB_BUILD_MAINT_OPTIONS=hardening=+all
 
 export PYBUILD_NAME=mapnik
+export PYBUILD_INTERPRETERS=python3.7
+export PYBUILD_VERSIONS=3.7
+export PYBUILD_DISABLE=test
+export PYBUILD_INSTALL_DIR=/usr/lib/python3/dist-packages
 
 # Enable Cairo support
 export PYCAIRO=true
@@ -18,9 +22,10 @@ export SYSTEM_FONTS=/usr/share/fonts
 # Custom mapnik libraries
 export LIB_DIR_NAME=/mapnik/3.0
 
+
 %:
 	dh $@ \
-		--with python2,python3 \
+		--with python3.7 \
 		--buildsystem=pybuild \
 		--parallel
 

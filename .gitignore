@@ -19,4 +19,5 @@ mapnik/paths.py
 mason_packages/
 mapnik/plugins
 
+# kx
 build-bionic

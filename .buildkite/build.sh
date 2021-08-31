@@ -12,8 +12,8 @@ export DEBFULLNAME="Koordinates CI Builder"
 
 echo "Updating changelog..."
 
-DEB_BASE_VERSION=1:3.0.23
-DEB_VERSION="${DEB_BASE_VERSION}+ci${BUILDKITE_BUILD_NUMBER}-$(git show -s --date=format:%Y%m%d --format=git%cd.%h)"
+DEB_BASE_VERSION=1:4.0.0~pre
+DEB_VERSION="${DEB_BASE_VERSION}.ci${BUILDKITE_BUILD_NUMBER}-$(git show -s --date=format:%Y%m%d --format=git%cd.%h)"
 echo "Debian Package Version: ${DEB_VERSION}"
 
 if [ -n "${BUILDKITE_AGENT_ACCESS_TOKEN-}" ] ; then 

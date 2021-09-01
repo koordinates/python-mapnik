@@ -6,7 +6,7 @@ Priority: optional
 Build-Depends: debhelper (>= 9),
                dh-python,
                libboost-python-dev,
-               libmapnik-dev (>= 4.0.0~pre.ci30-git20210901.887d4b7ca),
+               libmapnik-dev (>= 4.0.0~pre.ci31-git20210901.887d4b7ca),
                python3-setuptools,
                python3.7-dev,
                python3.7-cairo,

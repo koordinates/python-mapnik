@@ -13,6 +13,11 @@ export PYBUILD_VERSIONS=3.7
 export PYBUILD_DISABLE=test
 export PYBUILD_INSTALL_DIR=/usr/lib/python3/dist-packages
 
+# https://github.com/mapnik/python-mapnik/issues/168#issuecomment-343451848
+export BOOST_PYTHON_LIB=boost_python
+export BOOST_THREAD_LIB=boost_thread
+export BOOST_SYSTEM_LIB=boost_system
+
 # Enable Cairo support
 export PYCAIRO=true
 

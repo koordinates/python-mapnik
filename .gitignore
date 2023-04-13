@@ -18,3 +18,6 @@ dist/
 mason_packages/
 mapnik/plugins
 _skbuild/
+
+# kx
+build-*/

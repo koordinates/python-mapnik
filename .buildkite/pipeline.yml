@@ -1,0 +1,49 @@
+---
+steps:
+  - group: ":ubuntu: Build"
+    steps:
+      - label: ":python: Build (amd64)"
+        plugins:
+          docker#v3.8.0:
+            image: "${ECR}/kx-base-jammy-py3-build:master.latest"
+            workdir: /src/
+            environment:
+              - BUILDKITE_BUILD_NUMBER
+              - BUILDKITE_COMMIT
+              - BUILDKITE_BRANCH
+              - CI
+        command: ".buildkite/build-wheel.sh"
+        artifact_paths:
+          - "dist/*.whl"
+
+      - label: ":python: Build (arm64)"
+        plugins:
+          docker#v3.8.0:
+            image: "${ECR}/kx-base-jammy-py3-build:master.latest"
+            workdir: /src/
+            environment:
+              - BUILDKITE_BUILD_NUMBER
+              - BUILDKITE_COMMIT
+              - BUILDKITE_BRANCH
+              - CI
+        command: ".buildkite/build-wheel.sh"
+        artifact_paths:
+          - "dist/*.whl"
+        agents:
+          queue: default_arm64
+
+  - wait
+
+  - label: ":rocket: upload to devpi :ship:"
+    command:
+      - "devpi-upload dist/*"
+    plugins:
+      artifacts#v1.2.0:
+        download: "dist/*"
+      docker#v1.4.0:
+        image: "${ECR}/ci-tools:latest"
+        environment:
+          - DEVPI_USERNAME
+          - DEVPI_PASSWORD
+    retry:
+      automatic: true

@@ -5,8 +5,11 @@ find_package(Python COMPONENTS Interpreter Development.Module)
 find_package(mapnik CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread python${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
 
+add_compile_definitions(-DHAVE_PYCAIRO)
+
 #set(Python_SOABI ${SKBUILD_SOABI})
 Python_add_library(_mapnik MODULE)
+target_include_directories(_mapnik PUBLIC /usr/include/pycairo)
 target_link_libraries(_mapnik PRIVATE
     mapnik::mapnik 
     mapnik::json

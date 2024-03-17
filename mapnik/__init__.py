@@ -317,7 +317,7 @@ def _add_symbol_method_to_symbolizers(vars=globals()):
     def symbol_for_cls(self):
         return getattr(self, self.type())()
 
-    for name, obj in vars.items():
+    for name, obj in list(vars.items()):
         if name.endswith('Symbolizer') and not name.startswith('_'):
             if name == 'Symbolizer':
                 symbol = symbol_for_cls

@@ -19,14 +19,15 @@ steps:
   - wait
 
   - label: ":python: Publish to devpi"
-    command: .buildkite/publish-wheel.sh
+    command:
+      - "devpi-upload dist/*"
     plugins:
       - artifacts#v1.2.0:
           download: "dist/*"
       - docker#v1.4.0:
-          image: "${ECR}/ci-tools"
-          always-pull: true
-          workdir: /src
+          image: "${ECR}/ci-tools:latest"
           environment:
-            - DEVPI_USER
+            - DEVPI_USERNAME
             - DEVPI_PASSWORD
+    retry:
+      automatic: true

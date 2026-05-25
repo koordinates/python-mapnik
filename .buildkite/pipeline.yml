@@ -25,7 +25,7 @@ steps:
       - artifacts#v1.2.0:
           download: "dist/*"
       - docker#v1.4.0:
-          image: "${ECR}/ci-tools:latest"
+          image: "${ECR}/ci-tools:master.latest"
           environment:
             - DEVPI_USERNAME
             - DEVPI_PASSWORD

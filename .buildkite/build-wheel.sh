@@ -6,7 +6,7 @@ apt-get install -q -y --no-install-recommends \
     libmapnik-dev \
     libcairo2-dev
 
-pip install --index-url https://pypi.org/simple/ build pycairo
+pip install --index-url https://pypi.org/simple/ build pycairo 'setuptools>=80.9.0' 'pybind11>=3.0.2'
 
 export PYCAIRO=true
 export SYSTEM_FONTS=/usr/share/fonts

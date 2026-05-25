@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 apt-get update -q
-apt-get install -q -y \
+apt-get install -q -y --no-install-recommends \
     libmapnik4.0 \
     libmapnik-dev \
     libcairo2-dev

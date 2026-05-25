@@ -6,7 +6,7 @@ apt-get install -q -y --no-install-recommends \
     libmapnik-dev \
     libcairo2-dev
 
-pip install build pycairo
+pip install --index-url https://pypi.org/simple/ build pycairo
 
 export PYCAIRO=true
 export SYSTEM_FONTS=/usr/share/fonts

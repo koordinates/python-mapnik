@@ -49,6 +49,9 @@
 #include <mapnik/cairo_io.hpp>
 #include <mapnik/cairo/cairo_renderer.hpp>
 #include <cairo.h>
+#if defined(HAVE_PYCAIRO)
+#include <py3cairo.h>
+#endif
 #endif
 
 //stl

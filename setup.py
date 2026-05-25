@@ -2,90 +2,47 @@
 
 from pybind11.setup_helpers import Pybind11Extension, build_ext, ParallelCompile, naive_recompile
 from setuptools import setup, find_namespace_packages
-import sys, subprocess, os, glob
+import shlex
+import subprocess
+import os
+import sys
 
-
-mapnik_config = 'mapnik-config'
 
 def check_output(args):
      output = subprocess.check_output(args).decode()
      return output.rstrip('\n')
 
-linkflags = []
-bin_path = os.path.join(check_output([mapnik_config, '--prefix']),'bin')
-lib_path = os.path.join(check_output([mapnik_config, '--prefix']),'lib')
-icu_data = check_output([mapnik_config, '--icu-data'])
-proj_lib = check_output([mapnik_config, '--proj-lib'])
-gdal_data = check_output([mapnik_config, '--gdal-data'])
 
-linkflags.extend(check_output([mapnik_config, '--libs']).split(' '))
-linkflags.extend([
-    '-lmapnik-wkt',
-    '-lmapnik-json',
-])
+def pkg_config(*args):
+     return check_output(['pkg-config', *args])
 
-# Remove symlinks
-if os.path.islink('packaging/mapnik/bin') :
-     os.unlink('packaging/mapnik/bin')
-if os.path.islink('packaging/mapnik/lib') :
-     os.unlink('packaging/mapnik/lib')
-# Dynamically make the mapnik/paths.py file
+
+lib_path = os.path.join(pkg_config('--variable=prefix', 'libmapnik'), 'lib')
+input_plugin_path = pkg_config('--variable=plugins_dir', 'libmapnik')
+font_path = os.environ.get('SYSTEM_FONTS') or pkg_config('--variable=fonts_dir', 'libmapnik')
+
+linkflags = shlex.split(pkg_config('--libs', 'libmapnik'))
+
 f_paths = open('packaging/mapnik/paths.py', 'w')
 f_paths.write('import os\n')
 f_paths.write('\n')
-
-if os.environ.get('SYSTEM_MAPNIK'):
-     input_plugin_path = check_output([mapnik_config, '--input-plugins'])
-     font_path = check_output([mapnik_config, '--fonts'])
-     f_paths.write("mapniklibpath = '{path}'\n".format(path=lib_path))
-     f_paths.write("inputpluginspath = '{path}'\n".format(path=input_plugin_path))
-     f_paths.write("fontscollectionpath = '{path}'\n".format(path=font_path))
-else:
-     if not os.path.exists('packaging/mapnik/bin'):
-          os.symlink(bin_path, 'packaging/mapnik/bin')
-     if not os.path.exists('packaging/mapnik/lib'):
-          os.symlink(lib_path, 'packaging/mapnik/lib')
-     else:
-          names = (name for name in os.listdir(lib_path) if os.path.isfile(os.path.join(lib_path, name)))
-          for name in names:
-               if not os.path.exists(os.path.join('packaging/mapnik/lib', name)):
-                    os.symlink(os.path.join(lib_path, name), os.path.join('packaging/mapnik/lib', name))
-          input_plugin_path = check_output([mapnik_config, '--input-plugins'])
-          if not os.path.exists('packaging/mapnik/lib/mapnik/input'):
-               os.symlink(input_plugin_path, 'packaging/mapnik/lib/mapnik/input')
-     if not os.path.exists('packaging/mapnik/share'):
-          os.mkdir('packaging/mapnik/share')
-     if not os.path.exists('packaging/mapnik/share/icu'):
-          os.mkdir('packaging/mapnik/share/icu')
-     result = glob.glob(os.path.join(icu_data,'*.dat'))
-     if len(result) == 1:
-          icu_dat_file = os.path.basename(result[0])
-          if not os.path.exists(os.path.join('packaging/mapnik/share/icu',icu_dat_file)):
-               os.symlink(result[0], os.path.join('packaging/mapnik/share/icu',icu_dat_file))
-     else:
-          print("Error: can't locate ICU data file")
-          sys.exit(1)
-     if not os.path.exists('packaging/mapnik/share/gdal'):
-          os.symlink(gdal_data, 'packaging/mapnik/share/gdal')
-     if not os.path.exists('packaging/mapnik/share/proj'):
-          os.symlink(gdal_data, 'packaging/mapnik/share/proj')
-     f_paths.write("mapniklibpath = os.path.join(os.path.dirname(__file__), 'lib')\n")
-     f_paths.write("inputpluginspath = os.path.join(os.path.dirname(__file__), 'lib/mapnik/input')\n")
-     f_paths.write("fontscollectionpath = os.path.join(os.path.dirname(__file__), 'lib/mapnik/fonts')\n")
-
+f_paths.write("mapniklibpath = '{path}'\n".format(path=lib_path))
+f_paths.write("mapniklibpath = os.path.normpath(mapniklibpath)\n")
+f_paths.write("inputpluginspath = '{path}'\n".format(path=input_plugin_path))
+f_paths.write("fontscollectionpath = '{path}'\n".format(path=font_path))
 f_paths.write("__all__ = [mapniklibpath,inputpluginspath,fontscollectionpath]\n")
 f_paths.close()
 
-extra_comp_args = check_output([mapnik_config, '--cflags']).split(' ')
-extra_comp_args = list(filter(lambda arg: arg != "-fvisibility=hidden", extra_comp_args))
+extra_comp_args = shlex.split(pkg_config('--cflags', 'libmapnik'))
+extra_comp_args = [a for a in extra_comp_args if a != "-fvisibility=hidden"]
 
-if sys.platform == 'darwin':
-     pass
-else:
+if os.environ.get("PYCAIRO", "false") == "true":
+     import cairo
+     extra_comp_args.append('-DHAVE_PYCAIRO')
+     extra_comp_args.append('-I' + cairo.get_include())
+
+if sys.platform != 'darwin':
      linkflags.append('-lrt')
-     linkflags.append('-Wl,-z,origin')
-     linkflags.append('-Wl,-rpath=$ORIGIN/lib')
-
 
 ext_modules = [
      Pybind11Extension(
@@ -145,9 +102,9 @@ ext_modules = [
 ]
 
 if os.environ.get("CC", False) == False:
-    os.environ["CC"] = check_output([mapnik_config, '--cxx'])
+    os.environ["CC"] = 'c++'
 if os.environ.get("CXX", False) == False:
-    os.environ["CXX"] = check_output([mapnik_config, '--cxx'])
+    os.environ["CXX"] = 'c++'
 
 ParallelCompile("NUM_JOBS", needs_recompile=naive_recompile).install()
 setup(
@@ -155,20 +112,6 @@ setup(
      include_package_data=True,
      packages=find_namespace_packages(where="packaging"),
      package_dir={"": "packaging"},
-     package_data={
-          "mapnik.include": ["*.hpp"],
-          "mapnik.bin": ["*"],
-          "mapnik.lib": ["libmapnik*"],
-          "mapnik.lib.mapnik.fonts":["*"],
-          "mapnik.lib.mapnik.input":["*.input"],
-          "mapnik.share.icu": ["*.dat"],
-          "mapnik.share.gdal": ["*"],
-          "mapnik.share.proj": ["*"]
-     },
-     exclude_package_data={
-          "mapnik.bin": ["mapnik-config"],
-          "mapnik.lib": ["*.a"]
-     },
      ext_modules=ext_modules,
      cmdclass={"build_ext": build_ext},
 )

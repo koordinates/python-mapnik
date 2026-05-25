@@ -1,0 +1,32 @@
+steps:
+  - label: ":python: Build wheel ({{ matrix.arch }})"
+    command: .buildkite/build-wheel.sh
+    artifact_paths:
+      - "dist/*"
+    plugins:
+      - docker#v5.12.0:
+          image: "276514628126.dkr.ecr.ap-southeast-2.amazonaws.com/kx-base-py314-build:master.latest"
+          propagate-environment: true
+          mount-buildkite-agent: true
+    agents:
+      queue: "default_{{ matrix.arch }}"
+    matrix:
+      setup:
+        arch:
+          - "amd64"
+          - "arm64"
+
+  - wait
+
+  - label: ":python: Publish to devpi"
+    command: .buildkite/publish-wheel.sh
+    plugins:
+      - artifacts#v1.2.0:
+          download: "dist/*"
+      - docker#v1.4.0:
+          image: "${ECR}/ci-tools"
+          always-pull: true
+          workdir: /src
+          environment:
+            - DEVPI_USER
+            - DEVPI_PASSWORD

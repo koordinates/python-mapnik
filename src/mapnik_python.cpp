@@ -63,6 +63,16 @@
 
 namespace py = pybind11;
 
+#if defined(HAVE_CAIRO) && defined(HAVE_PYCAIRO)
+inline bool is_pycairo_context(py::object const& obj) {
+    return Pycairo_CAPI && PyObject_TypeCheck(obj.ptr(), &PycairoContext_Type);
+}
+
+inline bool is_pycairo_surface(py::object const& obj) {
+    return Pycairo_CAPI && PyObject_TypeCheck(obj.ptr(), &PycairoSurface_Type);
+}
+#endif
+
 namespace {
 void clear_cache()
 {
@@ -243,93 +253,52 @@ void render_layer2(mapnik::Map const& map,
 
 #if defined(HAVE_CAIRO) && defined(HAVE_PYCAIRO)
 
-void render3(mapnik::Map const& map,
-             PycairoSurface* py_surface,
+void render_cairo(mapnik::Map const& map,
+             py::object cairo_obj,
              double scale_factor = 1.0,
              unsigned offset_x = 0,
              unsigned offset_y = 0)
 {
-    py::gil_scoped_release release;
-    mapnik::cairo_surface_ptr surface(cairo_surface_reference(py_surface->surface), mapnik::cairo_surface_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,mapnik::create_context(surface),scale_factor,offset_x,offset_y);
-    ren.apply();
+    if (is_pycairo_context(cairo_obj)) {
+        PycairoContext* py_context = reinterpret_cast<PycairoContext*>(cairo_obj.ptr());
+        py::gil_scoped_release release;
+        mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
+        mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context,scale_factor,offset_x,offset_y);
+        ren.apply();
+    } else if (is_pycairo_surface(cairo_obj)) {
+        PycairoSurface* py_surface = reinterpret_cast<PycairoSurface*>(cairo_obj.ptr());
+        py::gil_scoped_release release;
+        mapnik::cairo_surface_ptr surface(cairo_surface_reference(py_surface->surface), mapnik::cairo_surface_closer());
+        mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,mapnik::create_context(surface),scale_factor,offset_x,offset_y);
+        ren.apply();
+    } else {
+        throw py::type_error("expected cairo.Context or cairo.Surface");
+    }
 }
 
-void render4(mapnik::Map const& map, PycairoSurface* py_surface)
-{
-    py::gil_scoped_release release;
-    mapnik::cairo_surface_ptr surface(cairo_surface_reference(py_surface->surface), mapnik::cairo_surface_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,mapnik::create_context(surface));
-    ren.apply();
-}
-
-void render5(mapnik::Map const& map,
-             PycairoContext* py_context,
-             double scale_factor = 1.0,
-             unsigned offset_x = 0,
-             unsigned offset_y = 0)
-{
-    py::gil_scoped_release release;
-    mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context,scale_factor,offset_x, offset_y);
-    ren.apply();
-}
-
-void render6(mapnik::Map const& map, PycairoContext* py_context)
-{
-    py::gil_scoped_release release;
-    mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context);
-    ren.apply();
-}
-void render_with_detector2(
+void render_with_detector_cairo(
     mapnik::Map const& map,
-    PycairoContext* py_context,
-    std::shared_ptr<mapnik::label_collision_detector4> detector)
-{
-    py::gil_scoped_release release;
-    mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context,detector);
-    ren.apply();
-}
-
-void render_with_detector3(
-    mapnik::Map const& map,
-    PycairoContext* py_context,
+    py::object cairo_obj,
     std::shared_ptr<mapnik::label_collision_detector4> detector,
     double scale_factor = 1.0,
     unsigned offset_x = 0u,
     unsigned offset_y = 0u)
 {
-    py::gil_scoped_release release;
-    mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context,detector,scale_factor,offset_x,offset_y);
-    ren.apply();
-}
-
-void render_with_detector4(
-    mapnik::Map const& map,
-    PycairoSurface* py_surface,
-    std::shared_ptr<mapnik::label_collision_detector4> detector)
-{
-    py::gil_scoped_release release;
-    mapnik::cairo_surface_ptr surface(cairo_surface_reference(py_surface->surface), mapnik::cairo_surface_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map, mapnik::create_context(surface), detector);
-    ren.apply();
-}
-
-void render_with_detector5(
-    mapnik::Map const& map,
-    PycairoSurface* py_surface,
-    std::shared_ptr<mapnik::label_collision_detector4> detector,
-    double scale_factor = 1.0,
-    unsigned offset_x = 0u,
-    unsigned offset_y = 0u)
-{
-    py::gil_scoped_release release;
-    mapnik::cairo_surface_ptr surface(cairo_surface_reference(py_surface->surface), mapnik::cairo_surface_closer());
-    mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map, mapnik::create_context(surface), detector, scale_factor, offset_x, offset_y);
-    ren.apply();
+    if (is_pycairo_context(cairo_obj)) {
+        PycairoContext* py_context = reinterpret_cast<PycairoContext*>(cairo_obj.ptr());
+        py::gil_scoped_release release;
+        mapnik::cairo_ptr context(cairo_reference(py_context->ctx), mapnik::cairo_closer());
+        mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map,context,detector,scale_factor,offset_x,offset_y);
+        ren.apply();
+    } else if (is_pycairo_surface(cairo_obj)) {
+        PycairoSurface* py_surface = reinterpret_cast<PycairoSurface*>(cairo_obj.ptr());
+        py::gil_scoped_release release;
+        mapnik::cairo_surface_ptr surface(cairo_surface_reference(py_surface->surface), mapnik::cairo_surface_closer());
+        mapnik::cairo_renderer<mapnik::cairo_ptr> ren(map, mapnik::create_context(surface), detector, scale_factor, offset_x, offset_y);
+        ren.apply();
+    } else {
+        throw py::type_error("expected cairo.Context or cairo.Surface");
+    }
 }
 
 #endif
@@ -584,6 +553,7 @@ void export_dot_symbolizer(py::module const&);
 void export_shield_symbolizer(py::module const&);
 void export_group_symbolizer(py::module const&);
 void export_building_symbolizer(py::module const&);
+void export_view_transform(py::module const&);
 
 using mapnik::load_map;
 using mapnik::load_map_string;
@@ -592,6 +562,12 @@ using mapnik::save_map_to_string;
 
 
 PYBIND11_MODULE(_mapnik, m) {
+#if defined(HAVE_CAIRO) && defined(HAVE_PYCAIRO)
+    Pycairo_CAPI = (Pycairo_CAPI_t*) PyCapsule_Import(const_cast<char *>("cairo.CAPI"), 0);
+    if (Pycairo_CAPI == nullptr) {
+        PyErr_Clear();
+    }
+#endif
     export_color(m);
     export_composite_modes(m);
     export_coord(m);
@@ -639,6 +615,7 @@ PYBIND11_MODULE(_mapnik, m) {
     export_shield_symbolizer(m);
     export_group_symbolizer(m);
     export_building_symbolizer(m);
+    export_view_transform(m);
     // exceptions
     py::register_exception<mapnik::value_error>(m, "PyExc_MapnikValueError", PyExc_ValueError);
     //
@@ -690,118 +667,23 @@ PYBIND11_MODULE(_mapnik, m) {
           py::arg("offset_y") = 0);
 
 #if defined(HAVE_CAIRO) && defined(HAVE_PYCAIRO)
-    m.def("render",&render3,
-        "\n"
-        "Render Map to Cairo Surface using offsets\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, render, load_map\n"
-        ">>> from cairo import SVGSurface\n"
-        ">>> m = Map(256,256)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> render(m,surface,1,1)\n"
-        "\n"
+    m.def("render", &render_cairo,
+        "Render Map to a Cairo Surface or Context.\n",
+        py::arg("Map"),
+        py::arg("cairo_obj"),
+        py::arg("scale_factor") = 1.0,
+        py::arg("offset_x") = 0,
+        py::arg("offset_y") = 0
         );
 
-    m.def("render",&render4,
-        "\n"
-        "Render Map to Cairo Surface\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, render, load_map\n"
-        ">>> from cairo import SVGSurface\n"
-        ">>> m = Map(256,256)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> render(m,surface)\n"
-        "\n"
-        );
-
-    m.def("render",&render5,
-        "\n"
-        "Render Map to Cairo Context using offsets\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, render, load_map\n"
-        ">>> from cairo import SVGSurface, Context\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> ctx = Context(surface)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> render(m,context,1,1)\n"
-        "\n"
-        );
-
-    m.def("render",&render6,
-        "\n"
-        "Render Map to Cairo Context\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, render, load_map\n"
-        ">>> from cairo import SVGSurface, Context\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> ctx = Context(surface)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> render(m,context)\n"
-        "\n"
-        );
-
-    m.def("render_with_detector", &render_with_detector2,
-        "\n"
-        "Render Map to Cairo Context using a pre-constructed detector.\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, LabelCollisionDetector, render_with_detector, load_map\n"
-        ">>> from cairo import SVGSurface, Context\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> ctx = Context(surface)\n"
-        ">>> m = Map(256,256)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> detector = LabelCollisionDetector(m)\n"
-        ">>> render_with_detector(m, ctx, detector)\n"
-        );
-
-    m.def("render_with_detector", &render_with_detector3,
-        "\n"
-        "Render Map to Cairo Context using a pre-constructed detector, scale and offsets.\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, LabelCollisionDetector, render_with_detector, load_map\n"
-        ">>> from cairo import SVGSurface, Context\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> ctx = Context(surface)\n"
-        ">>> m = Map(256,256)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> detector = LabelCollisionDetector(m)\n"
-        ">>> render_with_detector(m, ctx, detector, 1, 1, 1)\n"
-        );
-
-    m.def("render_with_detector", &render_with_detector4,
-        "\n"
-        "Render Map to Cairo Surface using a pre-constructed detector.\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, LabelCollisionDetector, render_with_detector, load_map\n"
-        ">>> from cairo import SVGSurface, Context\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> m = Map(256,256)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> detector = LabelCollisionDetector(m)\n"
-        ">>> render_with_detector(m, surface, detector)\n"
-        );
-
-    m.def("render_with_detector", &render_with_detector5,
-        "\n"
-        "Render Map to Cairo Surface using a pre-constructed detector, scale and offsets.\n"
-        "\n"
-        "Usage:\n"
-        ">>> from mapnik import Map, LabelCollisionDetector, render_with_detector, load_map\n"
-        ">>> from cairo import SVGSurface, Context\n"
-        ">>> surface = SVGSurface('image.svg', m.width, m.height)\n"
-        ">>> m = Map(256,256)\n"
-        ">>> load_map(m,'mapfile.xml')\n"
-        ">>> detector = LabelCollisionDetector(m)\n"
-        ">>> render_with_detector(m, surface, detector, 1, 1, 1)\n"
+    m.def("render_with_detector", &render_with_detector_cairo,
+        "Render Map to a Cairo Surface or Context using a pre-constructed detector.\n",
+        py::arg("Map"),
+        py::arg("cairo_obj"),
+        py::arg("detector"),
+        py::arg("scale_factor") = 1.0,
+        py::arg("offset_x") = 0,
+        py::arg("offset_y") = 0
         );
 #endif
 

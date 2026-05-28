@@ -13,7 +13,7 @@ export SYSTEM_FONTS=/usr/share/fonts
 
 # needs to be a X.Y.Z.P version for setuptools
 COMMIT_TIME=$(git show -s --pretty=format:"%cd" --date=format:%Y%m%d%H%M%S)
-perl -pi -e "s/version = \"(\d+\.\d+\.\d+).*\"/version = \"\$1.${COMMIT_TIME}\"/g" pyproject.toml
+perl -pi -e "s/version = \"(\d+\.\d+\.\d+).*\"/version = \"\$1.dev${COMMIT_TIME}\"/g" pyproject.toml
 
 # build the wheel (to dist/)
 python3 -m build -w --no-isolation .

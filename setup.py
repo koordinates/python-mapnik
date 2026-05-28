@@ -94,7 +94,8 @@ ext_modules = [
                "src/mapnik_dot_symbolizer.cpp",
                "src/mapnik_building_symbolizer.cpp",
                "src/mapnik_shield_symbolizer.cpp",
-               "src/mapnik_group_symbolizer.cpp"
+               "src/mapnik_group_symbolizer.cpp",
+               "src/mapnik_view_transform.cpp"
           ],
           extra_compile_args=extra_comp_args,
           extra_link_args=linkflags,
